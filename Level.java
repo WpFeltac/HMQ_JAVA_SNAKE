@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -84,9 +85,7 @@ public class Level extends JPanel
 		
 		SetupTerrain();
 		
-		//Terrain width is also the required amount of articulations needed to win and go to level 2
-		//TODO : random and limits-depending spawning
-		snake = new Snake(snakeBase, terrainWidth * 2, 290, 225, this);
+		snake = new Snake(snakeBase, 81, 290, 225, this);
 		
 		SetInput();
 		SetRandomObstacles();
@@ -182,6 +181,7 @@ public class Level extends JPanel
 			SetRandomObstacles();
 			
 			appleCount = 0;
+			
 			RandomizeApples();
 		}
 		
@@ -533,7 +533,7 @@ public class Level extends JPanel
 	    }
 	    else if(blueApplePlacesArrayContains(appleCount)) 
 	    {
-	    	if(appleCount == blueApplePlaces[blueAppleIndex])
+	    	if(appleCount == blueApplePlaces[GetMatchedIndex(appleCount)])
 	    	{
 	    		apple = new Apple(rX, rY, Color.BLUE);
 	    		blueAppleIndex++;
@@ -733,11 +733,22 @@ public class Level extends JPanel
 		
 		for(int i = 0; i < count; i++)
 		{
+			boolean isOk = false;
+			
 			int possiblePlace = random.nextInt(0, terrainWidth * 2);
 			
-			while(blueApplePlacesArrayContains(possiblePlace) || blueApplePlaces[i] == redApplePlace)
-			{
+			while(blueApplePlacesArrayContains(possiblePlace) && !isOk)
+			{			
 				possiblePlace = random.nextInt(0, terrainWidth * 2);
+				
+				if(possiblePlace == redApplePlace)
+				{
+					possiblePlace = random.nextInt(0, terrainWidth * 2);
+				}
+				else
+				{
+					isOk = true;
+				}
 			}	
 			
 			blueApplePlaces[i] = possiblePlace;
@@ -759,6 +770,23 @@ public class Level extends JPanel
 		}
 		
 		return false;
+	}
+	
+	private int GetMatchedIndex(int match)
+	{
+		for(int i = 0; i < blueApplePlaces.length; i++)
+		{
+			if(blueApplePlaces[i] == match)
+			{
+				return i;
+			}
+			else 
+			{
+				return 0;
+			}
+		}
+		
+		return 0;
 	}
 	
 }
